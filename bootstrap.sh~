@@ -1,0 +1,11 @@
+#!/bin/sh
+apt-get update
+apt-get -y install libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libgdal-dev libfontconfig1-dev
+
+# python environment
+python3 -m pip install virtualenv
+python3 -m virtualenv pythonPlot
+./pythonPlot/bin/pip install numpy pandas plotly fsspec
+
+# run app
+Rscript packages.R
