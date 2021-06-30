@@ -7,7 +7,7 @@ ADD packages.R .
 
 RUN chmod +x bootstrap.sh
 RUN ./bootstrap.sh
-RUN R -e "install.packages(\"shinycssloaders\")"
+RUN R -e "install.packages(\"magrittr\")"
 
 COPY . .
 
