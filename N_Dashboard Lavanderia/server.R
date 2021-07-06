@@ -157,6 +157,7 @@ server <- function(input,output){
         a <- ticket("month")
         plot_ly(type = "indicator",
                 mode = "number+delta",
+                number = list('prefix' =  "$"),
                 value = round(last(ticket("month")$Total)), 
                 delta = list(reference = round(a$Total[16]), position = "right"),
                 height = 150) %>% 
@@ -169,7 +170,7 @@ server <- function(input,output){
         plot_ly(data = Ingresos_semanales(input$radioIngresos), x = ~Fecha,y = ~Kilos, mode = "lines", type = "scatter",
                 color = ~Tipo, colors = c("#312CE6","#2E5CF0","#3486D9","#2EC2F0","#2CE6E0"),
                 hovertemplate = paste0("<b>Fecha:</b> %{x}<br>",
-                  "<b>Ingreso:</b> %{y}<extra></extra>")) %>% 
+                  "<b>Ingreso:</b> %{y:.2f}<extra></extra>")) %>% 
           layout(title = "", 
                  legend = list(font = list(color = "white")),
                  yaxis = list(title = "Total", showgrid = F, color = "white"), 
@@ -180,7 +181,7 @@ server <- function(input,output){
       output$ticket_cli       <- renderPlotly({
         plot_ly(data = ticket(input$radioTicket), x = ~as_date(Fecha),y = ~Total, mode = "lines", type = "scatter",
                 hovertemplate = paste0("<b>Fecha:</b> %{x}<br>",
-                                       "<b>Ticket Promedio:</b> %{y}<extra></extra>")) %>% 
+                                       "<b>Ticket Promedio:</b> %{y:.2f}<extra></extra>")) %>% 
           layout(title = "", 
                  yaxis = list(title = "", color = "white", showgrid = F), 
                  xaxis = list(title = "", color = "white", showgrid = F),
@@ -193,13 +194,23 @@ server <- function(input,output){
   
       ##Body
       output$kilossemanal <- renderPlotly({
+        # input$radioKilos
+        limite1 = switch(input$radioKilos,
+                        "month" = 7980,
+                        "week"  = 1995,
+                        "day"   = 250)
+        
         plot_ly(data = kilos_semanales(input$radioKilos), x = ~Fecha, y = ~Total,type = "scatter",
                 mode = "lines", color = I("#3486D9"),
                 hovertemplate = paste0("<b>Fecha:</b> %{x}<br>",
-                                       "<b>Kilos:</b> %{y}<extra></extra>")) %>% 
+                                       "<b>Kilos:</b> %{y:.2f}<extra></extra>")) %>% 
+          add_lines(y = limite1, color = I("red"),
+                    hovertemplate = paste0("<b>Capacidad:</b> %{y:.2f}<extra></extra>")) %>% 
+          # add_lines(y = limite1[2], color = I("red")) %>% 
           config(displayModeBar = F, displaylogo = F) %>% 
           layout(plot_bgcolor='transparent',
             paper_bgcolor='transparent',
+            showlegend = F,
             title = "", 
             yaxis = list(color = "white", showgrid = F),
             xaxis = list(title ="",color = "white",showgrid = F,rangeselector = list(buttons = list( 
@@ -229,7 +240,7 @@ server <- function(input,output){
         plot_ly(data = histo(), type = "bar", x = ~Dia, y =~Promedio,
                 color = I("#2CE6E0"),
                 hovertemplate = paste0("<b>Dia:</b> %{x}<br>",
-                                       "<b>Promedio:</b> %{y}<extra></extra>")) %>% 
+                                       "<b>Promedio:</b> %{y:.2f}<extra></extra>")) %>% 
           layout(plot_bgcolor='transparent',
                  paper_bgcolor='transparent',
                  xaxis = list(title = "", categoryorder = "trace", showgrid = F, color ="white"),
@@ -244,7 +255,7 @@ server <- function(input,output){
                          "Probabilidad: %{y}<extra></extra>")) %>% 
           layout(plot_bgcolor='transparent',
                  paper_bgcolor='transparent',
-                 legend = list(font = list(color = "white")),
+                 legend = list(font = list(color = "white"), x = 0.5,y = 0.9),
                  xaxis = list(title = "Servicios", showgrid = F, color ="white"),
                  yaxis = list(title = "Probabilidad", tickformat = ".0%", showgrid = F, color = "white")) %>% 
           config(displayModeBar = F, displaylogo = F)

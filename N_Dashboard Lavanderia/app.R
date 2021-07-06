@@ -11,13 +11,15 @@ library(stringi)
 library(hablar)
 library(argonR)
 library(argonDash)
-# library(shinycssloaders)
 
-setwd("C:/Users/jfran/Desktop/SBR/N_Dashboard Lavanderia")
+#Change 
+setwd("C:/Users/jfran/Desktop/SBR/dashboard_tintoreria/N_Dashboard Lavanderia")
 
 datos <- read_xlsx(".\\Datos\\BaseDatos.xlsx")
 
 addResourcePath("logo",".\\Recursos\\logo.png")
+addResourcePath("gauge",".\\Recursos\\GaugeInstrucciones.png")
+addResourcePath("bullet",".\\Recursos\\BulletsInstrucciones.png")
 
 source(".\\Funciones\\main.R", encoding = "UTF-8")
 source(".\\server.R", encoding = "UTF-8")
