@@ -46,9 +46,6 @@ colores <- c("A" = "#312CE6","B"="#2E5CF0","C"="#3486D9","D"="#2EC2F0","E"="#2CE
       }
         
     
-    
-    
-    
   ## WordsClouds ----
     observaciones <- datos %>% 
       select(Observaciones,Fecha,Folio) %>% 
@@ -236,7 +233,7 @@ colores <- c("A" = "#312CE6","B"="#2E5CF0","C"="#3486D9","D"="#2EC2F0","E"="#2CE
               return(list("actual"=actual,"pasado"=pasado,"total"=total))
             }
         ## Body
-          ### Kilos Diarios
+          
             kilos_semanales <-  function(tipo){
             datos %>% select(Fecha, `Kilos por lavar`) %>% group_by(Fecha = cut(Fecha,tipo)) %>% 
               summarise(Total = sum(`Kilos por lavar`)) %>% mutate(Fecha = as_date(Fecha))
@@ -255,7 +252,115 @@ colores <- c("A" = "#312CE6","B"="#2E5CF0","C"="#3486D9","D"="#2EC2F0","E"="#2CE
                 melt(variable.name ="Servicio", value.name = "Servicios")
             }
 
+# Visualizador ----
             
+            complemento <- 
+            tibble("Dia" = c("domingo","lunes","martes","miércoles","jueves","viernes","sábado"),
+                   "Veces" = c(0,0,0,0,0,0,0))
             
-
-    
+            compra_dia_semana <- function(id=1){
+              datos %>% filter(Id_cliente == id) %>% 
+                select(Id_cliente,Dia) %>% 
+                group_by(Dia) %>% summarise(Veces = n()) %>% ungroup() %>%
+                union_all(complemento) %>% 
+                group_by(Dia) %>% summarise(Veces = sum(Veces)) %>%
+                dplyr::arrange(factor(Dia, levels = c("domingo","lunes","martes","miércoles","jueves","viernes","sábado")))
+            }
+            
+            # Sun busrt
+            
+            sun <- function(id=1){
+              
+              top <-
+              datos %>% filter(Id_cliente == id) %>% 
+                select(`Servicios lavado`,`Servicios planchado`,
+                       Almohadas,Sacos,Ropa,Chamarras,Manteles,Otros,
+                       Tenis,Cobertor,Cobind,Cobmat,Cobkin) %>% 
+                transmute(
+                      "Lavado" = `Servicios lavado`,
+                      "Planchado"  = `Servicios planchado`,
+                      "Extras" = ifelse(is.na(Almohadas),0,Almohadas)+ 
+                                  ifelse(is.na(Sacos),0,Sacos)+
+                                  ifelse(is.na(Ropa),0,Ropa)+
+                                  ifelse(is.na(Chamarras),0,Chamarras)+
+                                  ifelse(is.na(Manteles),0,Manteles)+
+                                  ifelse(is.na(Otros),0,Otros),
+                       
+                       "Otros" =  ifelse(is.na(Tenis),0,Tenis)+
+                                  ifelse(is.na(Cobertor),0,Cobertor)+
+                                  ifelse(is.na(Cobind),0,Cobind)+
+                                  ifelse(is.na(Cobmat),0,Cobmat)+
+                                  ifelse(is.na(Cobkin),0,Cobkin)
+                         ) %>%
+                melt(variable.name = "label",value.name = "value") %>% 
+                group_by(label) %>% summarise(value = sum(value)) 
+              
+              top <- as.data.frame(cbind(top, "parents" = ""))
+              
+              bottom <-
+              datos %>% filter(Id_cliente == id) %>% 
+                select(Almohadas,Sacos,Ropa,Chamarras,Manteles,Otros,
+                       Tenis,Cobertor,Cobind,Cobmat,Cobkin) %>% 
+                dplyr::rename("Otros_"="Otros") %>% 
+                melt(variable.name = "label",value.name = "value") %>% 
+                mutate(parents = 
+                         ifelse(label %in% c("Almohadas","Sacos","Ropa","Chamarras","Manteles","Otros"),
+                                         "Extras","Otros")) %>% 
+                group_by(label,parents) %>% summarise(value = sum(value)) %>% ungroup() %>% 
+                as.data.frame()
+            
+                
+              
+              return(rbind(top,bottom))
+            }
+            
+            visitas <- function(id = 1){
+              Fechas <- as_tibble(cbind(
+                    "Fecha" = 
+                          seq.Date(from = as.Date('2020-03-01'),
+                                   to = as.Date('2021-05-01'), by = 'month'),
+                    "visitas" = 0)) %>% 
+                mutate(Fecha = as_date(Fecha))
+              
+              visitas <- 
+              datos %>% filter(Id_cliente == id) %>% 
+                select(Fecha) %>% group_by(Fecha = cut(Fecha,"month")) %>% 
+                summarise(y = n()) %>% mutate(Fecha = as_date(Fecha))
+              
+              visitas <- 
+                left_join(Fechas,visitas, by = "Fecha") %>% 
+                  transmute("Fecha" = Fecha,
+                            "Visitas" = visitas + ifelse(is.na(y),0,y))
+                return(visitas)
+            }
+            datostbl <- function(id = 1){
+              
+              dat <- 
+              datos %>% filter(Id_cliente == id) %>% 
+                select(Folio, Fecha, Total,`Total Lavado`,`Total planchado`,
+                       `Total extras`,`Total otros`,Observaciones)
+              
+              reactable(dat,
+                        columns = list(
+                          "Folio" = colDef(format = colFormat(prefix = "#"),align = "center",maxWidth = 90),
+                          "Fecha" = colDef(format = colFormat(date = T), align = "center", maxWidth = 90),
+                          "Total" = colDef(format = colFormat(prefix = "$"), align = "center", maxWidth = 90),
+                          "Total Lavado" = colDef(format = colFormat(prefix = "$"), align = "center", maxWidth = 90),
+                          "Total planchado" = colDef(format = colFormat(prefix = "$"), align = "center", maxWidth = 100),
+                          "Total extras" = colDef(format = colFormat(prefix = "$"), align = "center", maxWidth = 90),
+                          "Total otros" = colDef(format = colFormat(prefix = "$"), align = "center", maxWidth = 90),
+                          "Observaciones" = colDef()),
+                        searchable = T,highlight = T,
+                        theme = reactableTheme(
+                          color = "hsl(233, 9%, 87%)", # Letras
+                          backgroundColor = "#172b4d", # Fondo
+                          borderColor = "#233D57",
+                          highlightColor = "#233D57", 
+                          inputStyle = list(backgroundColor = "#233D57"),
+                          selectStyle = list(backgroundColor = "#125599"),
+                          pageButtonHoverStyle = list(backgroundColor = "#125599"),
+                          pageButtonActiveStyle = list(backgroundColor = "#125599"),
+                          style = list(fontFamily = "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"),
+                          searchInputStyle = list(width = "50%")))
+            }
+            

@@ -12,12 +12,13 @@ ui <- argonDashPage(
       id = "options",
       brand_url = "https://www.2mlavadoyplanchado.com/",brand_logo = "logo",
     argonSidebarMenu(
-      argonSidebarItem(tabName = "clientes_tab",style="text-align:center","Clientes"),
-      argonSidebarItem(tabName = "finanzas_tab",style="text-align:center","Finanzas"),
-      argonSidebarItem(tabName = "logistica_tab",style="text-align:center","Logística"))),
+      argonSidebarItem(tabName = "clientes_tab" ,style="text-align:center","Clientes"),
+      argonSidebarItem(tabName = "finanzas_tab" ,style="text-align:center","Finanzas"),
+      argonSidebarItem(tabName = "logistica_tab",style="text-align:center","Logística"),
+      argonSidebarItem(tabName = "vis_tab"      ,style="text-align:center","Visualizador"))),
   
 
-  body = argonDashBody(argonTabItems(clientes,finanzas,logistica)),
+  body = argonDashBody(argonTabItems(clientes,finanzas,logistica,visualizador)),
   
   footer = argonDashFooter(copyrights = "Actualizado el 28/6/2021",tags$head(includeCSS('.\\Recursos\\style.css')))
 )

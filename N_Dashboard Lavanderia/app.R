@@ -11,8 +11,8 @@ library(stringi)
 library(hablar)
 library(argonR)
 library(argonDash)
+library(RColorBrewer)
 
-#Change 
 setwd("C:/Users/jfran/Desktop/SBR/dashboard_tintoreria/N_Dashboard Lavanderia")
 
 datos <- read_xlsx(".\\Datos\\BaseDatos.xlsx")
@@ -27,6 +27,7 @@ source(".\\server.R", encoding = "UTF-8")
 source(".\\Funciones\\tab_clientes.R",encoding = "UTF-8")
 source(".\\Funciones\\tab_finanzas.R", encoding = "UTF-8")
 source(".\\Funciones\\tab_logistica.R", encoding = "UTF-8")
+source(".\\Funciones\\tab_vis.R", encoding = "UTF-8")
 
 source(".\\ui.R", encoding = "UTF-8")
 shinyApp(ui=ui,server=server)

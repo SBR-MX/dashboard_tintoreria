@@ -260,4 +260,73 @@ server <- function(input,output){
                  yaxis = list(title = "Probabilidad", tickformat = ".0%", showgrid = F, color = "white")) %>% 
           config(displayModeBar = F, displaylogo = F)
       })
+      
+      #Visualizador ----
+      output$text <- renderText(paste("#ID:",input$id))
+      updateSelectizeInput(getDefaultReactiveDomain(), 'id', choices = 1:1374, server = TRUE)
+      output$name <- renderText({
+        datos %>% filter(Id_cliente == input$id) %>% pull(Cliente) %>% first()
+        }) 
+
+      output$compra_dia <- renderPlotly({
+        plot_ly(data = compra_dia_semana(input$id), type = "bar", x = ~Dia,y=~Veces,
+                color = I("#2CE6E0"),
+                hovertemplate = paste0("<b>Dia:</b> %{x}<br>",
+                                       "<b>Veces:</b> %{y}<extra></extra>")) %>%
+          layout(plot_bgcolor='transparent',
+                 paper_bgcolor='transparent',
+                 xaxis = list(title = "", categoryorder = "trace", showgrid = F, color ="white"),
+                 yaxis = list(title = "", showgrid = F, color = "white")) %>% 
+          config(displayModeBar = F, displaylogo = F)
+      })
+      output$sun <- renderPlotly({
+        plot_ly(data = sun(input$id),type = 'sunburst', 
+                labels = ~label, parents = ~parents,values = ~value, 
+                branchvalues = 'total', insidetextorientation='radial') %>% 
+          layout(plot_bgcolor='transparent',paper_bgcolor='transparent',
+                 colorway = c("A" = "#312CE6","B"="#2E5CF0","C"="#3486D9","D"="#2EC2F0","E"="#2CE6E0")) %>% 
+          config(displayModeBar = F, displaylogo = F)
+      })
+      
+     
+      output$visitas <- renderPlotly({
+        plot_ly(data = visitas(input$id),type = "scatter",mode = "lines",
+                x=~Fecha,y=~Visitas, hovertemplate = "<b>Fecha:</b> %{x}<br><b>Veces:</b> %{y}<extra></extra>",
+                color = I("#2CE6E0")) %>% 
+          layout(title = "",
+                 yaxis = list(title = "", showgrid = F, color = "white"), 
+                 xaxis = list(title = "", showgrid = F, color = "white"),
+                 plot_bgcolor='transparent',
+                 paper_bgcolor='transparent') %>% 
+          config(displayModeBar = F, displaylogo = F)
+      })
+      
+      #Resumen
+      output$name2      <- renderText({
+        datos %>% filter(Id_cliente == input$id) %>% pull(Cliente) %>% first()
+      }) 
+      output$telefono   <- renderText({
+        tel <- 
+        datos %>% filter(Id_cliente == input$id) %>% pull(Teléfono) %>% first()
+        ifelse(is.na(tel),"No disponible",
+               tel)
+      }) 
+      output$Servicios  <- renderText({
+ 
+        datos %>% filter(Id_cliente == input$id) %>% pull(Fecha) %>% length()
+
+      })
+      output$Cuenta     <- renderText({
+        paste0("$ ",
+        datos %>% filter(Id_cliente == input$id) %>% 
+          pull(Total) %>% sum() %>% round(2))
+      })
+      output$Descuentos <- renderText({
+        paste0("$ ",
+               datos %>% filter(Id_cliente == input$id) %>% 
+                 pull(`Total descuento`) %>% sum() %>% round(2))
+      })
+      
+      output$tabla_visitas <- renderReactable({datostbl(input$id)})
+      
 }
