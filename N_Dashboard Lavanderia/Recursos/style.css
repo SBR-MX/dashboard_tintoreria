@@ -1,0 +1,44 @@
+#sidebar-menu{
+  display: ruby;
+}
+
+#options{
+  background-color: #272940;
+}
+
+#row_altura{
+ height: 30vh; 
+}
+
+.card-header{
+  display: ruby;
+  background-color: #172b4d;
+  height: 0px;
+}
+
+#radioClientes, #radioIngresos,#radioTicket,#radioKilos{
+  margin-left: 5vw;
+}
+
+#spinn1{
+  width: 100%;
+  top: 50%;
+}
+
+.tip .tipText {
+  visibility: hidden;
+  /*width: 20vw;*/
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  /*padding: 5px 0;*/
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tip:hover .tipText {
+  visibility: visible;
+}
