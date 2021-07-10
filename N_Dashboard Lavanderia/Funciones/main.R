@@ -242,14 +242,27 @@ colores <- c("A" = "#312CE6","B"="#2E5CF0","C"="#3486D9","D"="#2EC2F0","E"="#2CE
               datos %>% select(Fecha) %>% 
                 group_by(Fecha) %>% summarise(Total = n()) %>% ungroup() %>% 
                 mutate(Dia = weekdays(Fecha)) %>% group_by(Dia) %>% 
-                summarise(Promedio = mean(Total)) %>% 
+                summarise(Promedio = mean(Total),) %>% 
                 dplyr::arrange(factor(Dia, levels = c("domingo","lunes","martes","miércoles","jueves","viernes","sábado")))
             }
+            lineas_curvas <- function(){
+              
+            }
+            
             curvas <- function(){
               datos %>% select(Fecha,`Servicios lavado`,`Servicios planchado`,
                                `Servicios extras`,`Servicios otros`) %>% 
                 group_by(Fecha) %>% summarise_if(is.numeric,sum) %>% select(-Fecha) %>%
                 melt(variable.name ="Servicio", value.name = "Servicios")
+            }
+            lineas_curvas <- function(){
+                curvas() %>% group_by(Servicio) %>% 
+                summarise(Promedio = mean(Servicios,na.rm = T),
+                          Sd = sd(Servicios, na.rm = T),
+                          superior = Promedio + 3*Sd,
+                          Inferior = ifelse((Promedio - 3*Sd)<0,0,(Promedio - 3*Sd)),
+                          "99.865" = quantile(Servicios,probs = 0.99865, na.rm = TRUE),
+                          "0.00135" = quantile(Servicios, probs = 0.00135, na.rm = TRUE))
             }
 
 # Visualizador ----

@@ -159,7 +159,7 @@ server <- function(input,output){
                 mode = "number+delta",
                 number = list('prefix' =  "$"),
                 value = round(last(ticket("month")$Total)), 
-                delta = list(reference = round(a$Total[16]), position = "right"),
+                delta = list(reference = round(a$Total[16]), position = "right",'valueformat' =  "$"),
                 height = 150) %>% 
           layout(plot_bgcolor='transparent',paper_bgcolor='transparent') %>% 
           config(displayModeBar = F,displaylogo = F)
@@ -248,13 +248,16 @@ server <- function(input,output){
           config(displayModeBar = F, displaylogo = F)
       })
       output$histogram    <- renderPlotly({
-        plot_ly(data =curvas(),type = "histogram",colors = c("#312CE6","#3486D9","#2EC2F0","#2CE6E0"),
-                color = ~Servicio,x = ~Servicios,
-                histnorm = "probability",hovertemplate = 
-                  paste0("Cantidad de Servicios: %{x}<br>",
-                         "Probabilidad: %{y}<extra></extra>")) %>% 
+        
+          plot_ly(data =curvas(),type = "histogram",colors = c("#312CE6","#3486D9","#2EC2F0","#2CE6E0"),
+                  color = ~Servicio,x = ~Servicios,histnorm = "probability",
+                  hovertemplate = paste0("Cantidad de Servicios: %{x}<br>","Probabilidad: %{y}<extra></extra>")) %>%
+          add_lines(x = 29,y = c(0,.36),color = I("red"),
+                    hovertemplate = paste0("<b>LS Lavado:</b> %{x:.2f}<extra></extra>"),showlegend = F) %>%
+          add_lines(x = 9,y = c(0,.36),color = I("red"),
+                    hovertemplate = paste0("<b>LS Otros:</b> %{x:.2f}<extra></extra>"),showlegend = F) %>%
           layout(plot_bgcolor='transparent',
-                 paper_bgcolor='transparent',
+            paper_bgcolor='transparent',
                  legend = list(font = list(color = "white"), x = 0.5,y = 0.9),
                  xaxis = list(title = "Servicios", showgrid = F, color ="white"),
                  yaxis = list(title = "Probabilidad", tickformat = ".0%", showgrid = F, color = "white")) %>% 
