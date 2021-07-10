@@ -20,5 +20,5 @@ ui <- argonDashPage(
 
   body = argonDashBody(argonTabItems(clientes,finanzas,logistica,visualizador)),
   
-  footer = argonDashFooter(copyrights = "Actualizado el 28/6/2021",tags$head(includeCSS('./Recursos/style.css')))
+  footer = argonDashFooter(copyrights = "Actualizado el 28/6/2021",tags$head(includeCSS('.\\Recursos\\style.css')))
 )
