@@ -1,5 +1,5 @@
 #sidebar-menu{
-  display: ruby;
+  display: -webkit-box;
 }
 
 #options{
@@ -11,13 +11,16 @@
 }
 
 .card-header{
-  display: ruby;
+  /*display: flex;*/
   background-color: #172b4d;
   height: 0px;
 }
 
 #radioClientes, #radioIngresos,#radioTicket,#radioKilos{
   margin-left: 5vw;
+  left: 180px;
+  top: 55px;
+  position: absolute;
 }
 
 #spinn1{
