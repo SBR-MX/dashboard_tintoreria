@@ -30,10 +30,10 @@ logistica <- argonTabItem(
       shadow = TRUE),
     
     argonInfoCard(
-      value = round(duracion()$actual[[4]],1), 
+      value = round(duracion()$actual[[1]],1), 
       title = "Duración del Servicio", 
-      stat  = round(duracion()$actual[[4]] - duracion()$pasado[[4]],2), 
-      stat_icon = icon("arrow-down"),
+      stat  = round(duracion()$actual[[1]] - duracion()$pasado[[1]],2), 
+      stat_icon = icon("arrow-up"),
       description = "En dias", 
       icon = icon("stopwatch"), 
       icon_background = "yellow",
